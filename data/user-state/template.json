@@ -1,0 +1,76 @@
+{
+  "player": {
+    "id": "player_001",
+    "name": "",
+    "created_at": "",
+    "game_version": "0.1.0"
+  },
+  "global": {
+    "total_level": 1,
+    "total_exp": 0,
+    "days_active": 0,
+    "current_streak": 0,
+    "longest_streak": 0,
+    "difficulty": "medium",
+    "achievements_unlocked": []
+  },
+  "dimensions": {
+    "physical": {
+      "level": 1,
+      "exp": 0,
+      "score": 50,
+      "locked": false,
+      "active_goals": [],
+      "streak": { "current": 0, "longest": 0 },
+      "last_active": null
+    },
+    "energy": {
+      "level": 1,
+      "exp": 0,
+      "score": 50,
+      "locked": false,
+      "active_goals": [],
+      "streak": { "current": 0, "longest": 0 },
+      "last_active": null
+    },
+    "career": {
+      "level": 1,
+      "exp": 0,
+      "score": 50,
+      "locked": false,
+      "active_goals": [],
+      "streak": { "current": 0, "longest": 0 },
+      "last_active": null
+    },
+    "social": {
+      "level": 0,
+      "exp": 0,
+      "score": 0,
+      "locked": true,
+      "unlock_progress": { "energy_level": 0, "career_level": 0, "required": { "energy": 5, "career": 3 } },
+      "active_goals": [],
+      "streak": { "current": 0, "longest": 0 },
+      "last_active": null
+    },
+    "finance": {
+      "level": 0,
+      "exp": 0,
+      "score": 0,
+      "locked": true,
+      "unlock_progress": { "career_level": 0, "physical_level": 0, "required": { "career": 5, "physical": 3 } },
+      "active_goals": [],
+      "streak": { "current": 0, "longest": 0 },
+      "last_active": null
+    }
+  },
+  "world_state": {
+    "current_patch": null,
+    "patch_history": [],
+    "active_modifiers": []
+  },
+  "history": {
+    "onboarding_completed": false,
+    "total_tasks_completed": 0,
+    "total_actions_taken": 0
+  }
+}

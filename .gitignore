@@ -1,0 +1,61 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+
+# Environment files (contain secrets)
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+
+# Test
+test-results/
+playwright-report/
+
+# Claude Code / OMC
+.claude/
+.omc/
+.claude-internal/
+CLAUDE.md
+
+# Generated analysis docs (dev session artifacts)
+ANALYSIS_SUMMARY.md
+DEMO_EXECUTION_FLOW.md
+DEMO_QUEST_ANALYSIS.md
+DIMENSION_DETAIL_STYLING_REPORT.md
+HIERARCHY_QUICK_REFERENCE.md
+HIERARCHY_SYSTEM_ANALYSIS.md
+OPENCLAW_API_ANALYSIS.md
+OPENCLAW_CODE_SNIPPETS.md
+OPENCLAW_INDEX.md
+OPENCLAW_SUMMARY.txt
+PLAN.md
+QUICK_REFERENCE.md
+README_SERVICES.md
+SERVICES_ARCHITECTURE.md
+SERVICES_DATA_TYPES.md
+SERVICES_DIAGRAMS.md
+SERVICES_QUICK_REFERENCE.md
+
+# Demo recordings
+demo-recordings/
+
+# Temp
+VD/
+viz-new/
+config/
