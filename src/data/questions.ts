@@ -13,6 +13,10 @@ export interface Question {
   questionText: string
   options: QuestionOption[]
   allowCustom: boolean
+  /** 自由文本输入的 placeholder */
+  freeTextPrompt?: string
+  /** 自由文本输入的提示语 */
+  freeTextHint?: string
 }
 
 export const QUESTIONS: Question[] = [
@@ -23,6 +27,8 @@ export const QUESTIONS: Question[] = [
     systemMessage: '正在扫描宿主基础生物节律...',
     questionText: '一般工作日的早晨，闹钟响后你的第一反应是？',
     allowCustom: true,
+    freeTextPrompt: '或者描述你真实的早晨状态...',
+    freeTextHint: '比如：赖到最后一秒才冲出门',
     options: [
       {
         id: 'q1a',
@@ -49,6 +55,8 @@ export const QUESTIONS: Question[] = [
     systemMessage: '扫描宿主物理属性...',
     questionText: '上一次让你觉得"身体真不错"是什么时候？',
     allowCustom: true,
+    freeTextPrompt: '或者说说你最近的身体感受...',
+    freeTextHint: '比如：每天跑步5公里，状态不错',
     options: [
       {
         id: 'q2a',
@@ -138,6 +146,8 @@ export const QUESTIONS: Question[] = [
     systemMessage: '属性校准即将完成，需要宿主确认优先发展方向...',
     questionText: '如果接下来的30天你只能专注提升一个方面，你会选？',
     allowCustom: true,
+    freeTextPrompt: '或者描述你最想改变的事...',
+    freeTextHint: '比如：想养成每天阅读的习惯',
     options: [
       {
         id: 'q5a',

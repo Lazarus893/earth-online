@@ -85,11 +85,14 @@ export default function ChatPanel({ open, onClose, messages, loading, streamingC
               </div>
               <div className="chat-panel__actions">
                 <button
-                  className="chat-panel__btn"
-                  onClick={onClear}
-                  title="清除记录"
+                  className="chat-panel__btn chat-panel__btn--clear"
+                  onClick={() => {
+                    if (messages.length === 0) return
+                    if (window.confirm('清除所有对话记录？')) onClear()
+                  }}
+                  title="清除对话记录"
                 >
-                  ⟳
+                  🗑
                 </button>
                 <button
                   className="chat-panel__btn"

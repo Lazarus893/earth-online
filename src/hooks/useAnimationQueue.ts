@@ -7,7 +7,7 @@ import { useState, useCallback, useRef, useEffect } from 'react'
  * 同优先级内按入队顺序 (FIFO)
  */
 
-export type AnimationEventType = 'notification' | 'hp-warning' | 'level-up' | 'unlock'
+export type AnimationEventType = 'notification' | 'hp-warning' | 'level-up' | 'unlock' | 'checkin'
 
 export interface AnimationEvent {
   id: string
@@ -23,6 +23,7 @@ const PRIORITY: Record<AnimationEventType, number> = {
   'level-up': 30,
   'unlock': 20,
   'notification': 10,
+  'checkin': 5,
 }
 
 let idCounter = 0
@@ -91,6 +92,7 @@ export function useAnimationQueue() {
       'hp-warning': 5000,
       'level-up': 7000,
       'unlock': 7000,
+      'checkin': 15000, // 较长，给用户时间阅读和决定
     }
     const timeout = currentEvent.duration ?? defaultDurations[currentEvent.type]
 

@@ -53,7 +53,7 @@ export default function QuestPanel({ quests, onComplete }: QuestPanelProps) {
       <div className="quest-board__list">
         {quests.map((q, i) => {
           const qColor = dimColorMap[q.dimension] || colors.patch
-          const prio = priorityMap[q.priority]
+          const prio = priorityMap[q.priority || 'low']
           return (
             <motion.div
               key={q.id}

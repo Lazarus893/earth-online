@@ -32,29 +32,33 @@ export interface Quest {
   dimension: DimensionKey
   exp: number
   done: boolean
-  priority: 'high' | 'medium' | 'low'
+  logged?: boolean          // v4 别名 — 等同 done，迁移兼容
+  loggedAt?: number         // 记录时间戳
+  note?: string             // 用户备注
+  priority?: 'high' | 'medium' | 'low' // deprecated, 保留兼容
+  sourceActionId?: string   // hierarchy action 来源 ID
 }
 
-const QUEST_POOL: Record<string, { text: string; dimension: DimensionKey; exp: number; priority: 'high' | 'medium' | 'low' }[]> = {
+const QUEST_POOL: Record<string, { text: string; dimension: DimensionKey; exp: number }[]> = {
   physical: [
-    { text: '30min 有氧运动', dimension: 'physical', exp: 18, priority: 'high' },
-    { text: '50个深蹲', dimension: 'physical', exp: 12, priority: 'medium' },
-    { text: '跑步2公里', dimension: 'physical', exp: 15, priority: 'medium' },
-    { text: '拉伸15分钟', dimension: 'physical', exp: 8, priority: 'low' },
-    { text: '做3组俯卧撑', dimension: 'physical', exp: 10, priority: 'medium' },
+    { text: '30min 有氧运动', dimension: 'physical', exp: 18 },
+    { text: '50个深蹲', dimension: 'physical', exp: 12 },
+    { text: '跑步2公里', dimension: 'physical', exp: 15 },
+    { text: '拉伸15分钟', dimension: 'physical', exp: 8 },
+    { text: '做3组俯卧撑', dimension: 'physical', exp: 10 },
   ],
   energy: [
-    { text: '冥想10分钟', dimension: 'energy', exp: 10, priority: 'medium' },
-    { text: '23:00前关灯睡觉', dimension: 'energy', exp: 12, priority: 'high' },
-    { text: '午间小憩20分钟', dimension: 'energy', exp: 8, priority: 'low' },
-    { text: '完成3个番茄钟', dimension: 'energy', exp: 15, priority: 'medium' },
+    { text: '冥想10分钟', dimension: 'energy', exp: 10 },
+    { text: '23:00前关灯睡觉', dimension: 'energy', exp: 12 },
+    { text: '午间小憩20分钟', dimension: 'energy', exp: 8 },
+    { text: '完成3个番茄钟', dimension: 'energy', exp: 15 },
   ],
   career: [
-    { text: '完成技术日报', dimension: 'career', exp: 24, priority: 'high' },
-    { text: '阅读30页', dimension: 'career', exp: 15, priority: 'medium' },
-    { text: '写500字笔记', dimension: 'career', exp: 18, priority: 'medium' },
-    { text: '学习一个新概念', dimension: 'career', exp: 12, priority: 'low' },
-    { text: '完成一个代码PR', dimension: 'career', exp: 20, priority: 'high' },
+    { text: '完成技术日报', dimension: 'career', exp: 24 },
+    { text: '阅读30页', dimension: 'career', exp: 15 },
+    { text: '写500字笔记', dimension: 'career', exp: 18 },
+    { text: '学习一个新概念', dimension: 'career', exp: 12 },
+    { text: '完成一个代码PR', dimension: 'career', exp: 20 },
   ],
 }
 
@@ -349,7 +353,7 @@ export function useGameState(patchModifiers?: Record<string, number>) {
       const quest = prev.find(q => q.id === questId)
       if (!quest || quest.done) return prev
 
-      const updated = prev.map(q => q.id === questId ? { ...q, done: true } : q)
+      const updated = prev.map(q => q.id === questId ? { ...q, done: true, logged: true, loggedAt: Date.now() } : q)
 
       // 异步加经验 (避免 setState 嵌套)
       setTimeout(() => addExp(quest.dimension, quest.exp), 0)
@@ -377,6 +381,12 @@ export function useGameState(patchModifiers?: Record<string, number>) {
     localStorage.setItem('earth-online-scores', JSON.stringify(scores))
     persist(updated, quests, streak, true)
   }, [persist, quests, streak])
+
+  // ─── 替换每日日志条目（AI 生成后调用） ───
+  const replaceQuests = useCallback((newQuests: Quest[]) => {
+    setQuests(newQuests)
+    persist(dimensions, newQuests, streak, onboardingDone)
+  }, [dimensions, persist, streak, onboardingDone])
 
   // ─── 计算玩家总等级 ───
   const playerLevel = dimensions
@@ -411,5 +421,6 @@ export function useGameState(patchModifiers?: Record<string, number>) {
     completeQuest,
     addExp,
     completeOnboarding,
+    replaceQuests,
   }
 }

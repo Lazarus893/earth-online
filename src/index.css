@@ -531,10 +531,11 @@ body {
 
 .dimension-orbit-card__metric {
   display: flex;
+  flex-direction: column;
   min-height: 26px;
-  align-items: baseline;
+  align-items: center;
   justify-content: center;
-  gap: 6px;
+  gap: 2px;
 }
 
 .dimension-orbit-card__level,
@@ -543,6 +544,13 @@ body {
   font-size: 9px;
   letter-spacing: 0.12em;
   color: rgba(226, 232, 240, 0.5);
+}
+
+.dimension-orbit-card__status {
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  line-height: 1;
 }
 
 .dimension-orbit-card__bar {
@@ -701,6 +709,152 @@ body {
   color: rgba(251, 191, 36, 0.8);
 }
 
+/* ─── Journal Panel (日记式记录 — 替代 Quest Board) ─── */
+
+.journal-panel {
+  position: relative;
+  width: 320px;
+  max-height: 260px;
+  overflow-y: auto;
+  padding: 14px 16px;
+  background: rgba(9, 14, 25, 0.92);
+  border: 1px solid rgba(34, 211, 238, 0.10);
+  border-radius: 4px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  scrollbar-width: thin;
+  scrollbar-color: rgba(34, 211, 238, 0.15) transparent;
+}
+
+.journal-panel__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.journal-panel__loading {
+  padding: 24px 0;
+  text-align: center;
+}
+
+.journal-panel__loading-text {
+  font-size: 11px;
+  color: rgba(226, 232, 240, 0.5);
+  font-style: italic;
+}
+
+.journal-panel__list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.journal-panel__item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 6px 4px;
+  transition: opacity 0.2s ease;
+}
+
+.journal-panel__item.is-logged {
+  opacity: 0.55;
+}
+
+.journal-panel__dot {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  margin-top: 2px;
+  border-radius: 50%;
+  border: 1.5px solid;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.journal-panel__dot:disabled {
+  cursor: default;
+}
+
+.journal-panel__dot:not(:disabled):hover {
+  border-color: rgba(34, 211, 238, 0.5);
+  background: rgba(34, 211, 238, 0.08);
+}
+
+.journal-panel__check {
+  font-size: 9px;
+  color: #fff;
+  line-height: 1;
+}
+
+.journal-panel__content {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  cursor: pointer;
+}
+
+.journal-panel__text {
+  color: #e2e8f0;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.journal-panel__text.is-logged {
+  text-decoration: line-through;
+  color: rgba(226, 232, 240, 0.5);
+}
+
+.journal-panel__meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.journal-panel__dim {
+  font-size: 10px;
+  font-weight: 500;
+}
+
+.journal-panel__exp {
+  font-family: 'JetBrains Mono', 'Fira Code', 'SF Mono', monospace;
+  font-size: 10px;
+  color: rgba(251, 191, 36, 0.7);
+}
+
+.journal-panel__reflection {
+  margin-top: 12px;
+  padding: 10px 12px;
+  background: rgba(16, 185, 129, 0.04);
+  border: 1px solid rgba(16, 185, 129, 0.12);
+  border-radius: 4px;
+}
+
+.journal-panel__reflection-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+
+.journal-panel__reflection-icon {
+  color: rgba(16, 185, 129, 0.7);
+  font-size: 11px;
+}
+
+.journal-panel__reflection-text {
+  font-size: 11px;
+  color: rgba(226, 232, 240, 0.7);
+  line-height: 1.5;
+  margin: 0;
+}
+
 /* ─── Achievement Board (成就面板) ─── */
 
 .achievement-board {
@@ -800,6 +954,195 @@ body {
   height: 3px;
   border-radius: 1px;
   transition: width 0.25s ease, background 0.25s ease;
+}
+
+/* ─── Scheme Cards (觉醒路径三选一) ─── */
+
+.scheme-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 24px 22px;
+  text-align: left;
+  background: rgba(12, 17, 29, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 6px;
+  backdrop-filter: blur(12px);
+  overflow: hidden;
+  cursor: pointer;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.scheme-card:hover {
+  border-color: color-mix(in srgb, var(--scheme-color) 35%, transparent);
+  box-shadow:
+    0 0 20px color-mix(in srgb, var(--scheme-color) 8%, transparent),
+    0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+.scheme-card__glow {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+.scheme-card:hover .scheme-card__glow {
+  opacity: 1;
+}
+
+.scheme-card__badge-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.scheme-card__badge {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 700;
+  font-family: 'JetBrains Mono', monospace;
+  border: 1px solid;
+  border-radius: 4px;
+}
+
+.scheme-card__badge-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.scheme-card__label {
+  font-size: 11px;
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.scheme-card__tagline {
+  font-size: 10px;
+  color: rgba(156, 163, 175, 0.7);
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.scheme-card__name {
+  font-size: 17px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.92);
+  margin-top: 4px;
+}
+
+.scheme-card__desc {
+  font-size: 13px;
+  color: rgba(156, 163, 175, 0.85);
+  line-height: 1.6;
+}
+
+.scheme-card__goals {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 4px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.scheme-card__goal-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.scheme-card__goal-icon {
+  font-size: 14px;
+  opacity: 0.7;
+  flex-shrink: 0;
+}
+
+.scheme-card__goal-text {
+  font-size: 13px;
+  color: rgba(209, 213, 219, 0.9);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.scheme-card__gifts {
+  margin-top: 8px;
+  padding: 12px 14px;
+  background: linear-gradient(135deg, rgba(251, 191, 36, 0.04), rgba(251, 191, 36, 0.01));
+  border: 1px solid rgba(251, 191, 36, 0.12);
+  border-radius: 4px;
+}
+
+.scheme-card__gifts-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 10px;
+  font-size: 10px;
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  color: rgba(251, 191, 36, 0.85);
+}
+
+.scheme-card__gifts-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.scheme-card__gift-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.scheme-card__gift-icon {
+  flex-shrink: 0;
+  width: 20px;
+  text-align: center;
+  font-size: 13px;
+}
+
+.scheme-card__gift-info {
+  min-width: 0;
+}
+
+.scheme-card__gift-name {
+  display: block;
+  font-size: 12px;
+  color: rgba(229, 231, 235, 0.9);
+  font-weight: 500;
+}
+
+.scheme-card__gift-desc {
+  display: block;
+  font-size: 10px;
+  color: rgba(156, 163, 175, 0.6);
+  margin-top: 1px;
+}
+
+.scheme-card__stats {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: auto;
+  padding-top: 14px;
+  font-size: 10px;
+  font-family: 'JetBrains Mono', monospace;
+  color: rgba(107, 114, 128, 0.8);
+  letter-spacing: 0.05em;
 }
 
 .dimension-detail-shell {
@@ -2107,6 +2450,68 @@ body {
   font-family: 'JetBrains Mono', monospace;
   font-size: 10px;
   color: #06B6D4;
+}
+
+/* ─── Free Text Input (Onboarding 自由文本输入) ─── */
+
+.free-text-input {
+  padding: 12px 14px;
+  background: rgba(9, 14, 25, 0.8);
+  border: 1px solid rgba(34, 211, 238, 0.12);
+  border-radius: 4px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.free-text-input__hint {
+  font-size: 10px;
+  color: rgba(226, 232, 240, 0.35);
+  margin-bottom: 8px;
+  font-style: italic;
+}
+
+.free-text-input__field {
+  width: 100%;
+  background: transparent;
+  border: none;
+  outline: none;
+  resize: none;
+  color: #e2e8f0;
+  font-size: 13px;
+  line-height: 1.5;
+  font-family: inherit;
+}
+
+.free-text-input__field::placeholder {
+  color: rgba(226, 232, 240, 0.25);
+}
+
+.free-text-input__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.free-text-input__count {
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  font-size: 10px;
+}
+
+.free-text-input__submit {
+  font-size: 11px;
+  font-weight: 500;
+  padding: 4px 10px;
+  border: 1px solid;
+  border-radius: 2px;
+  background: transparent;
+  cursor: pointer;
+  transition: opacity 0.2s, background 0.2s;
+}
+
+.free-text-input__submit:not(:disabled):hover {
+  background: rgba(34, 211, 238, 0.06);
 }
 
 /* ═══════════════════════════════════════════════════════

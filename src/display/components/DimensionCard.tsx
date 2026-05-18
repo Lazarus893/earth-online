@@ -4,6 +4,7 @@ import type { DimensionData } from '../../App'
 import StatBar from './ui/StatBar'
 import HudText from './ui/HudText'
 import { colors, geometry, easing, duration } from '../../design-system'
+import { getStatusLabel, getStatusColor } from '../../data/dimensionStatus'
 
 interface DimensionCardProps {
   dimension: DimensionData
@@ -43,8 +44,10 @@ export default function DimensionCard({ dimension, onClick }: DimensionCardProps
           <span className="dimension-orbit-card__locked">LOCKED</span>
         ) : (
           <>
-            <span className="dimension-orbit-card__score">{score}</span>
             <span className="dimension-orbit-card__level">LV.{level}</span>
+            <span className="dimension-orbit-card__status" style={{ color: getStatusColor(score) }}>
+              {getStatusLabel(dimension.key, score)}
+            </span>
           </>
         )}
       </span>

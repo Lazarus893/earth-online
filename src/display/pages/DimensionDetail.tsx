@@ -13,6 +13,7 @@ import HierarchyTree from '../components/HierarchyTree'
 import { loadSelectedScheme, saveSelectedScheme, getGoalsForDimension, type HierarchyGoal } from '../../core/hierarchy'
 import { type SelectedItem, type EditResult } from '../../services/hierarchyEditor'
 import HierarchyEditDialog from '../components/HierarchyEditDialog'
+import { getStatusLabel, getStatusColor } from '../../data/dimensionStatus'
 
 interface DimensionDetailProps {
   dimension: DimensionData
@@ -270,9 +271,9 @@ export default function DimensionDetail({ dimension, allDimensions, onBack, onAd
             </div>
           </div>
 
-          {/* 右：分数 */}
+          {/* 右：分数 + 状态文案 */}
           <div className="detail-hero__score">
-            <HudText variant="label" color={colors.textDim}>SCORE</HudText>
+            <HudText variant="label" color={colors.textDim}>STATUS</HudText>
             <motion.div
               className="detail-hero__score-num"
               style={{ color: dimColor, textShadow: `0 0 16px ${dimColor}44` }}
@@ -282,6 +283,12 @@ export default function DimensionDetail({ dimension, allDimensions, onBack, onAd
             >
               {dimension.score}
             </motion.div>
+            <span
+              className="detail-hero__status-label"
+              style={{ color: getStatusColor(dimension.score), fontSize: '11px', fontWeight: 500, letterSpacing: '0.02em' }}
+            >
+              {getStatusLabel(dimension.key, dimension.score)}
+            </span>
           </div>
         </motion.section>
 

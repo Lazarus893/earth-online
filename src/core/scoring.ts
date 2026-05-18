@@ -87,3 +87,42 @@ export function computeOnboardingResult(selectedOptions: QuestionOption[]): Onbo
     highestDimension: getHighestDimension(scores),
   }
 }
+
+/**
+ * 从逐轮累加的信号直接计算结果（动态 AI onboarding 使用）
+ * 不再依赖 QuestionOption[]，而是用每轮 AI 返回的维度信号累加
+ */
+export function computeResultFromSignals(
+  accumulatedSignals: Partial<Record<DimensionKey, number>>,
+  priority: DimensionKey,
+  difficulty: Difficulty
+): OnboardingResult {
+  const scores: Record<DimensionKey, number> = {
+    physical: BASE_SCORE,
+    energy: BASE_SCORE,
+    career: BASE_SCORE,
+    social: BASE_SCORE,
+    finance: BASE_SCORE,
+  }
+
+  // 将累加信号应用到分数
+  for (const [dim, delta] of Object.entries(accumulatedSignals)) {
+    const key = dim as DimensionKey
+    if (DIMENSION_KEYS.includes(key) && typeof delta === 'number') {
+      scores[key] += delta * SCORE_MULTIPLIER
+    }
+  }
+
+  // Clamp
+  for (const key of DIMENSION_KEYS) {
+    scores[key] = clamp(scores[key], MIN_SCORE, MAX_SCORE)
+  }
+
+  return {
+    scores,
+    priority,
+    difficulty,
+    lowestDimension: getLowestDimension(scores),
+    highestDimension: getHighestDimension(scores),
+  }
+}

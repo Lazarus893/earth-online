@@ -1,12 +1,14 @@
 import { motion, AnimatePresence } from 'framer-motion'
 import type { Question, QuestionOption } from '../../../data/questions'
 import OptionButton from './OptionButton'
+import FreeTextInput from './FreeTextInput'
 
 interface QuestionCardProps {
   question: Question
   questionIndex: number
   selectedOption: QuestionOption | null
   onSelect: (option: QuestionOption) => void
+  onFreeText?: (questionId: string, text: string) => void
 }
 
 // 阶段色 — 对比强烈，不是渐变过渡
@@ -28,6 +30,7 @@ export default function QuestionCard({
   questionIndex,
   selectedOption,
   onSelect,
+  onFreeText,
 }: QuestionCardProps) {
   const phaseColor = PHASE_COLORS[question.phase]
 
@@ -104,6 +107,25 @@ export default function QuestionCard({
           </motion.div>
         ))}
       </div>
+
+      {/* 自由文本输入区 — 仅 allowCustom 的问题显示，预先展开 */}
+      {question.allowCustom && question.freeTextPrompt && onFreeText && !selectedOption && (
+        <motion.div
+          className="mt-3"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.4, duration: 0.3 }}
+        >
+          <div className="text-[11px] font-mono tracking-wide text-white/25 mb-2 text-center">
+            ── 或者用自己的话 ──
+          </div>
+          <FreeTextInput
+            placeholder={question.freeTextPrompt}
+            hint={question.freeTextHint}
+            onSubmit={(text) => onFreeText(question.id, text)}
+          />
+        </motion.div>
+      )}
     </motion.div>
   )
 }

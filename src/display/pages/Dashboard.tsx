@@ -6,7 +6,7 @@ import { colors, easing, duration } from '../../design-system'
 import WorldPatchBanner from '../components/WorldPatchBanner'
 import CharacterDisplay from '../components/CharacterDisplay'
 import DimensionCard from '../components/DimensionCard'
-import QuestPanel from '../components/QuestPanel'
+import JournalPanel from '../components/JournalPanel'
 import AchievementTicker from '../components/AchievementTicker'
 import StatBar from '../components/ui/StatBar'
 import HudText from '../components/ui/HudText'
@@ -21,6 +21,7 @@ interface DashboardProps {
   streak: number
   patch: WorldPatch | null
   patchLoading: boolean
+  journalLoading?: boolean
   onDimensionClick: (key: DimensionKey) => void
   onQuestComplete: (questId: string) => void
 }
@@ -33,7 +34,7 @@ const orbitClasses: Record<DimensionKey, string> = {
   finance: 'dashboard-node--finance',
 }
 
-export default function Dashboard({ dimensions, quests, playerLevel, playerExp, playerExpMax, streak, patch, patchLoading, onDimensionClick, onQuestComplete }: DashboardProps) {
+export default function Dashboard({ dimensions, quests, playerLevel, playerExp, playerExpMax, streak, patch, patchLoading, journalLoading, onDimensionClick, onQuestComplete }: DashboardProps) {
 
   return (
     <motion.div
@@ -152,7 +153,12 @@ export default function Dashboard({ dimensions, quests, playerLevel, playerExp, 
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 1.6, duration: duration.normal, ease: easing.smooth }}
           >
-            <QuestPanel quests={quests} onComplete={onQuestComplete} />
+            <JournalPanel
+              entries={quests as any}
+              dimensions={dimensions}
+              onLog={onQuestComplete}
+              loading={journalLoading}
+            />
             <AchievementTicker />
           </motion.div>
         </div>

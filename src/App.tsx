@@ -4,6 +4,8 @@ import Dashboard from './display/pages/Dashboard'
 import DimensionDetail from './display/pages/DimensionDetail'
 import Onboarding from './display/pages/Onboarding'
 import PlanSelection from './display/pages/PlanSelection'
+import Transition from './display/components/Transition'
+import ExitTransition from './display/components/ExitTransition'
 import LevelUpEffect from './display/components/LevelUpEffect'
 import UnlockReveal from './display/components/UnlockReveal'
 import NotificationBanner from './display/components/NotificationBanner'
@@ -15,7 +17,10 @@ import { useAnimationQueue } from './hooks/useAnimationQueue'
 import { useChatSystem } from './hooks/useChatSystem'
 import { useAudioSystem } from './hooks/useAudioSystem'
 import { useWorldPatch } from './hooks/useWorldPatch'
+import { useSceneContext } from './hooks/useSceneContext'
+import { useProactiveCheckin } from './hooks/useProactiveCheckin'
 import { getPatchModifiers } from './services/worldPatch'
+import { getDailyJournal } from './services/journalGenerator'
 import { loadSelectedScheme } from './core/hierarchy'
 import { assets } from './display/assets'
 import type { OnboardingResult } from './core/scoring'
@@ -38,7 +43,7 @@ export interface DimensionData {
 type AppView = 'onboarding' | 'plan-selection' | 'dashboard' | 'dimension'
 
 // ─── 数据版本控制：清理旧数据，确保干净开始 ───
-const DATA_VERSION = 'v6'
+const DATA_VERSION = 'v7'
 if (localStorage.getItem('earth-online-data-version') !== DATA_VERSION) {
   localStorage.removeItem('earth-online-game-state')
   localStorage.removeItem('earth-online-onboarding-done')
@@ -79,6 +84,14 @@ function App() {
     () => !!localStorage.getItem('earth-online-beginner-done')
   )
   const [chatOpen, setChatOpen] = useState(false)
+  const [journalLoading, setJournalLoading] = useState(false)
+  // 转场动画状态
+  const [showEnterTransition, setShowEnterTransition] = useState(false)
+  const [showExitTransition, setShowExitTransition] = useState(false)
+  const pendingDimensionRef = useRef<DimensionKey | null>(null)
+
+  // Scene context — 场景感知，供 chat 系统使用
+  const sceneContext = useSceneContext(currentView, selectedDimension)
 
   // Chat system
   const chat = useChatSystem({
@@ -86,7 +99,16 @@ function App() {
     quests: game.quests,
     streak: game.streak,
     playerLevel: game.playerLevel,
+    scene: sceneContext,
   })
+
+  // Proactive check-in — 检测阈值触发 Oracle 主动关心
+  const checkin = useProactiveCheckin(
+    game.dimensions,
+    game.quests,
+    game.streak,
+    game.onboardingDone
+  )
 
   // ─── 辅助：入队通知 ───
   const enqueueNotification = useCallback((msg: { message: string; sub?: string; type: 'info' | 'success' | 'warning' }) => {
@@ -113,6 +135,16 @@ function App() {
     game.consumeEvent()
   }, [game.currentEvent])
 
+  // ─── 监听 proactive check-in → 入队通知 ───
+  useEffect(() => {
+    if (checkin.pendingCheckin && currentView === 'dashboard') {
+      animQueue.enqueue({
+        type: 'checkin',
+        payload: checkin.pendingCheckin,
+      })
+    }
+  }, [checkin.pendingCheckin, currentView])
+
   // Global Cmd+K shortcut to toggle chat
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
@@ -124,6 +156,33 @@ function App() {
     window.addEventListener('keydown', handler)
     return () => window.removeEventListener('keydown', handler)
   }, [])
+
+  // ─── AI 日志生成（新一天时从 hierarchy 中智能选择条目） ───
+  const journalGenRef = useRef(false)
+  useEffect(() => {
+    if (currentView !== 'dashboard' || journalGenRef.current) return
+    if (!game.onboardingDone) return
+
+    // 检查是否需要生成（quests 为空或日期过期由 useGameState 内部处理，
+    // 这里只负责尝试用 AI 替换随机生成的 fallback）
+    journalGenRef.current = true
+    setJournalLoading(true)
+
+    getDailyJournal(game.dimensions).then(entries => {
+      if (entries.length > 0) {
+        // 将 JournalEntry 转为 Quest 兼容格式
+        const quests = entries.map(e => ({
+          ...e,
+          done: e.logged,
+        }))
+        game.replaceQuests(quests)
+      }
+    }).catch(() => {
+      // AI 失败 — 保持 useGameState 内部生成的 fallback quests
+    }).finally(() => {
+      setJournalLoading(false)
+    })
+  }, [currentView, game.onboardingDone])
 
   // Onboarding 完成
   const handleOnboardingComplete = useCallback((result: OnboardingResult) => {
@@ -161,12 +220,31 @@ function App() {
     }
   }, [game, beginnerQuestShown, enqueueNotification])
 
-  // 维度点击 → 直接切换（不用 Persona 转场）
+  // 维度点击 → 播放 VD01 入场转场动画
   const handleDimensionClick = (key: DimensionKey) => {
     const dim = game.dimensions.find(d => d.key === key)
     if (dim?.locked) return
-    setSelectedDimension(key)
+    pendingDimensionRef.current = key
+    setShowEnterTransition(true)
+  }
+
+  // VD01 入场转场完成 → 切换到维度详情
+  const handleEnterTransitionComplete = () => {
+    setSelectedDimension(pendingDimensionRef.current)
     setCurrentView('dimension')
+    setShowEnterTransition(false)
+  }
+
+  // 维度返回 → 播放 VD12 出场转场动画
+  const handleDimensionBack = () => {
+    setShowExitTransition(true)
+  }
+
+  // VD12 出场转场完成 → 回到仪表盘
+  const handleExitTransitionComplete = () => {
+    setShowExitTransition(false)
+    setCurrentView('dashboard')
+    setSelectedDimension(null)
   }
 
   // 任务完成
@@ -213,6 +291,7 @@ function App() {
             streak={game.streak}
             patch={patch}
             patchLoading={patchLoading}
+            journalLoading={journalLoading}
             onDimensionClick={handleDimensionClick}
             onQuestComplete={handleQuestComplete}
           />
@@ -231,14 +310,32 @@ function App() {
             <DimensionDetail
               dimension={game.dimensions.find(d => d.key === selectedDimension)!}
               allDimensions={game.dimensions}
-              onBack={() => {
-                setCurrentView('dashboard')
-                setSelectedDimension(null)
-              }}
+              onBack={handleDimensionBack}
               onAddExp={(dimKey, amount) => game.addExp(dimKey, amount)}
               onInjectChat={chat.injectMessage}
             />
           </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* ─── VD01 GTA5风格入场转场 ─── */}
+      <AnimatePresence>
+        {showEnterTransition && pendingDimensionRef.current && (
+          <Transition
+            key="enter-transition"
+            dimension={pendingDimensionRef.current}
+            onComplete={handleEnterTransitionComplete}
+          />
+        )}
+      </AnimatePresence>
+
+      {/* ─── VD12 出场转场 ─── */}
+      <AnimatePresence>
+        {showExitTransition && (
+          <ExitTransition
+            key="exit-transition"
+            onComplete={handleExitTransitionComplete}
+          />
         )}
       </AnimatePresence>
 
@@ -271,6 +368,25 @@ function App() {
         type={animQueue.currentEvent?.type === 'notification' ? animQueue.currentEvent.payload.type : 'info'}
         onDismiss={animQueue.dequeue}
         autoDismissMs={4000}
+      />
+
+      {/* ─── Proactive Check-in (Oracle 主动关心) ─── */}
+      <NotificationBanner
+        show={animQueue.currentEvent?.type === 'checkin'}
+        message={animQueue.currentEvent?.type === 'checkin' ? `✦ ${animQueue.currentEvent.payload.message}` : ''}
+        subMessage="点击回应 Oracle"
+        type="info"
+        onDismiss={() => {
+          // 点击通知 → 打开聊天 + 注入 Oracle 消息
+          if (animQueue.currentEvent?.type === 'checkin') {
+            const msg = animQueue.currentEvent.payload.message
+            setChatOpen(true)
+            chat.injectMessage({ role: 'system', content: msg })
+            checkin.dismissCheckin()
+          }
+          animQueue.dequeue()
+        }}
+        autoDismissMs={12000}
       />
 
       {/* ─── 系统终端对话 ─── */}

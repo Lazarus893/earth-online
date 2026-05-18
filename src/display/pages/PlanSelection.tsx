@@ -137,14 +137,12 @@ export default function PlanSelection({ dimensions, onComplete }: PlanSelectionP
             >
               <SystemMessageSequence
                 messages={[
-                  { text: '正在扫描宿主设备上下文...', type: 'system' as const, speed: 30, pauseAfter: 1200 },
-                  { text: '> 职业背景：数据分析师（3年） → 转行 AI 产品经理（入行 2 个月）', speed: 25, pauseAfter: 600 },
-                  { text: '> 检测到核心技能分布：SQL/Python 数据分析 Lv.7，AI 产品设计 Lv.2，Prompt Engineering Lv.1', speed: 22, pauseAfter: 700 },
-                  { text: '> 检测到 GitHub：近30天 commits 12次，主要为数据脚本，AI项目 0 个', speed: 25, pauseAfter: 600 },
-                  { text: '> 检测到作息数据：平均入睡 01:32，运动频率 0次/月，精力评估 C-', speed: 25, pauseAfter: 600 },
-                  { text: '> 检测到学习记录：《AI产品经理实战》进度 15%，中断 9 天', speed: 25, pauseAfter: 800 },
-                  { text: '⚠ 检测到宿主当前各项能力偏低，系统将发放新手礼包以加速觉醒', type: 'warning' as const, speed: 22, pauseAfter: 1000 },
-                  { text: '宿主画像生成完毕。结合属性校准数据，Oracle 正在计算最优觉醒路径...', type: 'reward' as const, speed: 22, pauseAfter: 1500 },
+                  { text: '正在整合宿主对话数据...', type: 'system' as const, speed: 30, pauseAfter: 1000 },
+                  { text: '> 核心诉求已锁定，正在匹配觉醒路径模板...', speed: 25, pauseAfter: 800 },
+                  { text: '> 分析维度优先级...', speed: 28, pauseAfter: 600 },
+                  { text: '> 计算最优资源配置方案...', speed: 25, pauseAfter: 700 },
+                  { text: '⚠ 系统将根据宿主当前状态发放专属新手礼包', type: 'warning' as const, speed: 22, pauseAfter: 1000 },
+                  { text: 'Oracle 正在生成觉醒路径...', type: 'reward' as const, speed: 22, pauseAfter: 1200 },
                 ]}
                 onAllComplete={handleContextComplete}
               />
@@ -194,93 +192,73 @@ export default function PlanSelection({ dimensions, onComplete }: PlanSelectionP
               />
 
               {/* 三张方案卡片 */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-5 w-full">
                 {schemes.map((scheme, i) => {
                   const meta = STYLE_META[scheme.style]
                   const gifts = STARTER_GIFTS[scheme.style]
                   return (
                     <motion.button
                       key={scheme.id}
-                      className="relative flex flex-col gap-4 p-7 text-left rounded-sm border border-white/[0.06] hover:border-white/[0.15] transition-colors"
+                      className="scheme-card"
                       style={{
-                        background: 'rgba(17, 24, 39, 0.7)',
-                        backdropFilter: 'blur(8px)',
-                      }}
-                      initial={{ opacity: 0, y: 20 }}
+                        '--scheme-color': meta.color,
+                      } as React.CSSProperties}
+                      initial={{ opacity: 0, y: 24 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.2 + i * 0.15, duration: duration.normal, ease: easing.smooth }}
-                      whileHover={{ scale: 1.03, borderColor: `${meta.color}44` }}
-                      whileTap={{ scale: 0.98 }}
+                      whileHover={{ y: -4, transition: { duration: 0.2 } }}
+                      whileTap={{ scale: 0.97 }}
                       onClick={() => handleSelect(scheme)}
                     >
-                      {/* Badge + Tagline */}
-                      <div className="flex items-center gap-3">
-                        <span
-                          className="w-8 h-8 flex items-center justify-center text-xs font-bold rounded-sm"
-                          style={{ background: `${meta.color}22`, color: meta.color }}
-                        >
+                      {/* 顶部发光条 */}
+                      <div className="scheme-card__glow" style={{ background: `linear-gradient(90deg, transparent, ${meta.color}40, transparent)` }} />
+
+                      {/* Badge 区域 */}
+                      <div className="scheme-card__badge-row">
+                        <div className="scheme-card__badge" style={{ background: `${meta.color}18`, color: meta.color, borderColor: `${meta.color}30` }}>
                           {meta.badge}
-                        </span>
-                        <div>
-                          <span
-                            className="text-xs font-mono tracking-wider uppercase block"
-                            style={{ color: meta.color }}
-                          >
-                            {meta.label}
-                          </span>
-                          <span className="text-[9px] text-gray-500 font-mono">{meta.tagline}</span>
+                        </div>
+                        <div className="scheme-card__badge-info">
+                          <span className="scheme-card__label" style={{ color: meta.color }}>{meta.label}</span>
+                          <span className="scheme-card__tagline">{meta.tagline}</span>
                         </div>
                       </div>
 
-                      {/* 方案名 */}
-                      <h3 className="text-lg font-bold text-white/90">
-                        {scheme.name}
-                      </h3>
-
-                      {/* 描述 */}
-                      <p className="text-sm text-gray-400 leading-relaxed">
-                        {scheme.description}
-                      </p>
+                      {/* 方案名 + 描述 */}
+                      <h3 className="scheme-card__name">{scheme.name}</h3>
+                      <p className="scheme-card__desc">{scheme.description}</p>
 
                       {/* Goals 预览 */}
-                      <div className="flex flex-col gap-2 mt-2 pt-3 border-t border-white/[0.05]">
+                      <div className="scheme-card__goals">
                         {scheme.goals.slice(0, 3).map(goal => (
-                          <div key={goal.id} className="flex items-center gap-2 text-sm">
-                            <span className="opacity-60">{goal.icon}</span>
-                            <span className="text-gray-300 truncate">{goal.text}</span>
+                          <div key={goal.id} className="scheme-card__goal-item">
+                            <span className="scheme-card__goal-icon">{goal.icon}</span>
+                            <span className="scheme-card__goal-text">{goal.text}</span>
                           </div>
                         ))}
                       </div>
 
-                      {/* ─── 新手礼包卡片 ─── */}
-                      <div
-                        className="mt-3 p-3 rounded-sm border"
-                        style={{
-                          background: 'linear-gradient(135deg, rgba(251,191,36,0.04), rgba(251,191,36,0.01))',
-                          borderColor: 'rgba(251,191,36,0.15)',
-                        }}
-                      >
-                        <div className="flex items-center gap-2 mb-2.5">
-                          <span className="text-amber-400 text-sm">🎁</span>
-                          <span className="text-[10px] font-mono tracking-wider text-amber-400/90 font-bold">
-                            STARTER PACK · 新手礼包
-                          </span>
+                      {/* 新手礼包 */}
+                      <div className="scheme-card__gifts">
+                        <div className="scheme-card__gifts-header">
+                          <span>🎁</span>
+                          <span>STARTER PACK</span>
                         </div>
-                        <div className="flex flex-col gap-2">
+                        <div className="scheme-card__gifts-list">
                           {gifts.map((gift, gi) => (
-                            <div key={gi} className="flex items-start gap-2">
-                              <span className="w-5 text-center text-sm flex-shrink-0">{gift.icon}</span>
-                              <div className="min-w-0">
-                                <span className="text-xs text-gray-200 block">{gift.name}</span>
-                                <span className="text-[10px] text-gray-500 block">{gift.description}</span>
+                            <div key={gi} className="scheme-card__gift-item">
+                              <span className="scheme-card__gift-icon">{gift.icon}</span>
+                              <div className="scheme-card__gift-info">
+                                <span className="scheme-card__gift-name">{gift.name}</span>
+                                <span className="scheme-card__gift-desc">{gift.description}</span>
                               </div>
                             </div>
                           ))}
                         </div>
                       </div>
 
-                      {/* 任务数统计 */}
-                      <div className="mt-auto pt-4 flex items-center gap-5 text-xs text-gray-500 font-mono">
+                      {/* 底部统计 */}
+                      <div className="scheme-card__stats">
                         <span>{scheme.goals.length} goals</span>
                         <span>{scheme.goals.reduce((s, g) => s + g.plans.length, 0)} plans</span>
                         <span>

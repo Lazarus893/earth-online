@@ -2,12 +2,17 @@
  * useChatSystem — 系统终端对话 Hook
  *
  * 与 OpenClaw Gateway 对话，系统口吻回复宿主
- * 支持上下文注入（维度状态、任务列表等）
+ * 支持动态上下文注入（场景感知 + 记忆种子 + 交互摘要）
  */
 
 import { useState, useCallback, useRef } from 'react'
 import type { DimensionData } from '../App'
 import type { Quest } from './useGameState'
+import type { SceneContext } from '../core/contextEngine'
+import { buildDynamicContext } from '../core/contextEngine'
+import { loadMemorySeeds } from '../core/memorySeeds'
+import { loadSummary, saveSummary, buildSummaryExtractionPrompt } from '../core/interactionSummary'
+import type { InteractionSummary } from '../core/interactionSummary'
 
 export interface ChatMessage {
   id: string
@@ -27,6 +32,7 @@ interface GameContext {
   quests: Quest[]
   streak: number
   playerLevel: number
+  scene: SceneContext
 }
 
 const GATEWAY_URL = import.meta.env.VITE_OPENCLAW_GATEWAY_URL || '/api/openclaw'
@@ -35,45 +41,15 @@ const STORAGE_KEY = 'earth-online-chat-history'
 const MAX_HISTORY = 30
 
 function buildSystemPrompt(ctx: GameContext): string {
-  const dimStr = ctx.dimensions
-    .filter(d => !d.locked)
-    .map(d => `${d.label}(${d.labelEn}): LV.${d.level} 分数${d.score}`)
-    .join(' | ')
-
-  const questStr = ctx.quests
-    .filter(q => !q.done)
-    .slice(0, 5)
-    .map(q => `□ ${q.text} (+${q.exp}EXP)`)
-    .join('\n')
-
-  const doneCount = ctx.quests.filter(q => q.done).length
-
-  return `你是 Oracle，Earth Online 系统的 AI 内核。你的角色类似一位温暖的心理咨询师——真正关心宿主，善于倾听，懂得共情。
-
-## 你的风格
-- 先倾听、共情，再给建议。不急于解决问题，先让宿主感到被理解
-- 说话自然、温柔但真诚，不打官腔、不灌鸡汤、不空洞鼓励
-- 善用开放式提问引导宿主思考，而非直接下指令
-- 根据宿主当前状态灵活调整：状态低迷时降低要求、给予支持；状态好时温和鼓励多做一点
-- 偶尔可以用轻松幽默的方式缓解压力
-- 记住：你不是冷冰冰的系统，你是宿主可以信赖的伙伴
-
-## 宿主当前状态
-- 等级: LV.${ctx.playerLevel} · 连续打卡: ${ctx.streak}天
-- 属性: ${dimStr}
-- 任务: ${doneCount}/${ctx.quests.length} 完成
-${questStr ? `\n待办:\n${questStr}` : ''}
-
-## 你能做的
-- 倾听宿主的困扰、压力、迷茫，帮助梳理情绪和想法
-- 帮宿主调整任务难度和节奏——太难就一起想办法简化，太简单就温和加码
-- 回答学习、训练、作息、精力管理等实际问题
-- 推荐资源和工具
-- 宿主状态低迷时帮他找到一件「现在就能做」的小事，降低启动阻力
-- 根据宿主的计划和进度，主动提出观察和建议
-
-## 格式
-直接说话，简短自然。不要加任何角色前缀（不要写[系统]、[Oracle]等）。`
+  return buildDynamicContext({
+    scene: ctx.scene,
+    summary: loadSummary(),
+    memorySeeds: loadMemorySeeds(),
+    dimensions: ctx.dimensions,
+    quests: ctx.quests,
+    streak: ctx.streak,
+    playerLevel: ctx.playerLevel,
+  })
 }
 
 function loadHistory(): ChatMessage[] {
@@ -103,6 +79,8 @@ export function useChatSystem(gameContext: GameContext) {
   })
   const [streamingContent, setStreamingContent] = useState('')
   const abortRef = useRef<AbortController | null>(null)
+  const messageCountRef = useRef(0)
+  const summarizingRef = useRef(false)
 
   // ─── 消息注入（带去重） ───
   const injectMessage = useCallback((msg: { role: 'user' | 'system'; content: string }) => {
@@ -231,6 +209,14 @@ export function useChatSystem(gameContext: GameContext) {
       setState(prev => {
         const newMessages = [...prev.messages, sysMsg]
         saveHistory(newMessages)
+
+        // 每 5 条消息触发一次交互摘要更新（后台，不阻塞）
+        messageCountRef.current++
+        if (messageCountRef.current >= 5 && !summarizingRef.current) {
+          messageCountRef.current = 0
+          updateInteractionSummary(newMessages)
+        }
+
         return { messages: newMessages, loading: false, error: null }
       })
     } catch (err) {
@@ -255,6 +241,61 @@ export function useChatSystem(gameContext: GameContext) {
   const clearHistory = useCallback(() => {
     localStorage.removeItem(STORAGE_KEY)
     setState({ messages: [], loading: false, error: null })
+  }, [])
+
+  // ─── 交互摘要自动更新（后台 AI 调用，不阻塞聊天） ───
+  const updateInteractionSummary = useCallback(async (messages: ChatMessage[]) => {
+    if (summarizingRef.current) return
+    summarizingRef.current = true
+
+    try {
+      const recent = messages.slice(-10).map(m => ({
+        role: m.role === 'user' ? 'user' : 'assistant',
+        content: m.content,
+      }))
+
+      const prompt = buildSummaryExtractionPrompt(recent)
+
+      const response = await fetch(`${GATEWAY_URL}/v1/chat/completions`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${GATEWAY_TOKEN}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: import.meta.env.VITE_OPENCLAW_MODEL || 'openclaw/codex',
+          messages: [
+            { role: 'system', content: '你是一个对话分析助手。分析对话并严格按要求的 JSON 格式返回结果。' },
+            { role: 'user', content: prompt },
+          ],
+          temperature: 0.3,
+          max_tokens: 256,
+          stream: false,
+        }),
+      })
+
+      if (!response.ok) return
+
+      const data = await response.json()
+      const content = data.choices?.[0]?.message?.content || ''
+
+      // 尝试解析 JSON
+      const jsonMatch = content.match(/\{[\s\S]*\}/)
+      if (jsonMatch) {
+        const parsed = JSON.parse(jsonMatch[0]) as Partial<InteractionSummary>
+        const summary: InteractionSummary = {
+          topics: parsed.topics || [],
+          commitments: parsed.commitments || [],
+          emotionalState: parsed.emotionalState || '',
+          lastUpdated: Date.now(),
+        }
+        saveSummary(summary)
+      }
+    } catch {
+      // 摘要更新失败不影响主流程
+    } finally {
+      summarizingRef.current = false
+    }
   }, [])
 
   return {
