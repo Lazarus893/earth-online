@@ -200,7 +200,7 @@ function App() {
     if (!beginnerQuestShown) {
       setTimeout(() => {
         enqueueNotification({
-          message: '[系统] 检测到宿主首次上线',
+          message: '[系统] 宿主，你终于来了。系统已等候多时。',
           sub: '完成任意操作即可领取觉醒奖励 +50 EXP',
           type: 'info',
         })
@@ -394,7 +394,7 @@ function App() {
         <button
           className="chat-trigger"
           onClick={() => setChatOpen(true)}
-          title="系统终端 (⌘K)"
+          title="Oracle 通讯 (⌘K)"
         >
           ⬡
           <span className="chat-trigger__hint">⌘K</span>

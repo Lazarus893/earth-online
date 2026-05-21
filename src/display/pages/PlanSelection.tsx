@@ -141,7 +141,7 @@ export default function PlanSelection({ dimensions, onComplete }: PlanSelectionP
                   { text: '> 核心诉求已锁定，正在匹配觉醒路径模板...', speed: 25, pauseAfter: 800 },
                   { text: '> 分析维度优先级...', speed: 28, pauseAfter: 600 },
                   { text: '> 计算最优资源配置方案...', speed: 25, pauseAfter: 700 },
-                  { text: '⚠ 系统将根据宿主当前状态发放专属新手礼包', type: 'warning' as const, speed: 22, pauseAfter: 1000 },
+                  { text: '⚠ Oracle 将根据宿主的状态准备专属新手礼包', type: 'warning' as const, speed: 22, pauseAfter: 1000 },
                   { text: 'Oracle 正在生成觉醒路径...', type: 'reward' as const, speed: 22, pauseAfter: 1200 },
                 ]}
                 onAllComplete={handleContextComplete}

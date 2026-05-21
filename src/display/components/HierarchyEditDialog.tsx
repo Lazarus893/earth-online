@@ -269,7 +269,7 @@ ${goalJson}
             <div className="hierarchy-edit-dialog__header">
               <div className="hierarchy-edit-dialog__title">
                 <OracleOrb size={22} />
-                <span>ORACLE 规划修改</span>
+                <span>Oracle 路径共创</span>
               </div>
               <button className="hierarchy-edit-dialog__close" onClick={handleCancel}>✕</button>
             </div>
@@ -292,7 +292,7 @@ ${goalJson}
               {/* Input phase */}
               {phase === 'input' && (
                 <div className="hierarchy-edit-dialog__input-hint">
-                  <p>可以输入修改指令（留空则由 Oracle 自动优化）：</p>
+                  <p>告诉 Oracle 你的想法（留空则由 Oracle 自主优化）：</p>
                 </div>
               )}
 
@@ -334,7 +334,7 @@ ${goalJson}
               {phase === 'error' && (
                 <div className="hierarchy-edit-dialog__error">
                   <span>⚠ {error}</span>
-                  <p>Oracle 暂时无法响应，请稍后重试。</p>
+                  <p>Oracle 暂时失联，请稍后再试。</p>
                 </div>
               )}
             </div>
@@ -347,7 +347,7 @@ ${goalJson}
                     ref={inputRef}
                     type="text"
                     className="hierarchy-edit-dialog__input"
-                    placeholder="修改指令（如：让任务更具体、降低难度...）"
+                    placeholder="你的想法（如：让任务更具体、降低难度...）"
                     value={userInstruction}
                     onChange={e => setUserInstruction(e.target.value)}
                     onKeyDown={e => {
@@ -360,7 +360,7 @@ ${goalJson}
                     style={{ borderColor: `${dimensionColor}66`, color: dimensionColor }}
                     onClick={handleSend}
                   >
-                    <span>✦</span> 发送修改
+                    <span>✦</span> 交给 Oracle
                   </button>
                 </>
               )}
@@ -375,7 +375,7 @@ ${goalJson}
                     style={{ background: `${dimensionColor}20`, borderColor: `${dimensionColor}55`, color: dimensionColor }}
                     onClick={handleApply}
                   >
-                    ✓ 应用修改
+                    ✓ 确认方向
                   </button>
                 </>
               )}

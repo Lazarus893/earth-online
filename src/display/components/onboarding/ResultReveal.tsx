@@ -238,7 +238,7 @@ export default function ResultReveal({ result, onStart }: ResultRevealProps) {
         transition={{ delay: 1.8, duration: 0.3 }}
       >
         <p className="text-[10px] font-mono tracking-[0.2em] uppercase text-gray-500 mb-1">
-          PRIORITY TARGET
+          核心关注
         </p>
         <p className="text-base font-bold" style={{ color: DIMENSION_META[focusDim].color }}>
           {DIMENSION_META[focusDim].icon} {DIMENSION_META[focusDim].label} — {PRIORITY_SUGGESTIONS[focusDim]}

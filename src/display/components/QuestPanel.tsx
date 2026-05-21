@@ -33,7 +33,7 @@ export default function QuestPanel({ quests, onComplete }: QuestPanelProps) {
       <div className="quest-board__header">
         <div className="flex items-center gap-2">
           <div className="w-1.5 h-1.5" style={{ background: colors.patch, clipPath: geometry.diamond }} />
-          <HudText variant="system" color={colors.patch}>DAILY QUESTS</HudText>
+          <HudText variant="system" color={colors.patch}>今日修行</HudText>
         </div>
         <div className="flex items-center gap-2">
           <HudText variant="label" color={colors.textDim}>{doneCount}/{totalCount}</HudText>

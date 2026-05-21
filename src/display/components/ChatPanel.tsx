@@ -81,16 +81,16 @@ export default function ChatPanel({ open, onClose, messages, loading, streamingC
             <div className="chat-panel__header">
               <div className="chat-panel__title">
                 <OracleOrb size={28} />
-                <span>ORACLE TERMINAL</span>
+                <span>ORACLE 通讯</span>
               </div>
               <div className="chat-panel__actions">
                 <button
                   className="chat-panel__btn chat-panel__btn--clear"
                   onClick={() => {
                     if (messages.length === 0) return
-                    if (window.confirm('清除所有对话记录？')) onClear()
+                    if (window.confirm('遗忘这段对话？')) onClear()
                   }}
-                  title="清除对话记录"
+                  title="遗忘对话"
                 >
                   🗑
                 </button>
@@ -169,7 +169,7 @@ export default function ChatPanel({ open, onClose, messages, loading, streamingC
                     animate={{ opacity: [0.3, 1, 0.3] }}
                     transition={{ duration: 1.2, repeat: Infinity }}
                   >
-                    信息处理中...
+                    Oracle 正在回应...
                   </motion.span>
                 </motion.div>
               )}
@@ -183,7 +183,7 @@ export default function ChatPanel({ open, onClose, messages, loading, streamingC
                 ref={inputRef}
                 type="text"
                 className="chat-panel__input"
-                placeholder="输入指令..."
+                placeholder="对 Oracle 说点什么..."
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={handleKeyDown}
@@ -194,7 +194,7 @@ export default function ChatPanel({ open, onClose, messages, loading, streamingC
                 onClick={handleSend}
                 disabled={!input.trim() || loading}
               >
-                发送
+                传达
               </button>
             </div>
           </motion.div>

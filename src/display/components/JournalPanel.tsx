@@ -81,7 +81,7 @@ export default function JournalPanel({ entries, dimensions, onLog, loading }: Jo
           <HudText variant="system" color={colors.patch}>TODAY</HudText>
         </div>
         <HudText variant="label" color={colors.textDim}>
-          {loggedCount > 0 ? `${loggedCount} 条已记录` : '等待记录'}
+          {loggedCount > 0 ? `${loggedCount} 条已记录` : '等待宿主记录'}
         </HudText>
       </div>
 
@@ -104,7 +104,7 @@ export default function JournalPanel({ entries, dimensions, onLog, loading }: Jo
                 background: entry.logged ? colors.patch : 'transparent',
                 borderColor: entry.logged ? colors.patch : 'rgba(226,232,240,0.2)',
               }}
-              title={entry.logged ? '已记录' : '点击记录'}
+              title={entry.logged ? '已记录' : '记录此刻'}
             >
               {entry.logged && <span className="journal-panel__check">✓</span>}
             </button>

@@ -83,7 +83,7 @@ export default function NotificationBanner({
                   )}
                 </div>
                 <div className="ml-auto">
-                  <HudText variant="label" color={colors.textDim}>TAP TO DISMISS</HudText>
+                  <HudText variant="label" color={colors.textDim}>轻触关闭</HudText>
                 </div>
               </motion.div>
             )}

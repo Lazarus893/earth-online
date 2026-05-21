@@ -4,9 +4,9 @@ import { colors, geometry, easing, duration } from '../../design-system'
 import HudText from './ui/HudText'
 
 const achievements = [
-  { text: '七日连胜', sub: 'STREAK × 7', icon: '🔥', color: colors.exp, progress: 100 },
-  { text: '精力突破 Lv.3', sub: 'ENERGY UP', icon: '⚡', color: colors.energy, progress: 100 },
-  { text: '全维觉醒', sub: 'UNLOCK ALL', icon: '◆', color: colors.career, progress: 60 },
+  { text: '七日连胜', sub: '连续觉醒 × 7', icon: '🔥', color: colors.exp, progress: 100 },
+  { text: '精力突破 Lv.3', sub: '精力突破', icon: '⚡', color: colors.energy, progress: 100 },
+  { text: '全维觉醒', sub: '全维觉醒', icon: '◆', color: colors.career, progress: 60 },
 ]
 
 export default function AchievementTicker() {
@@ -28,7 +28,7 @@ export default function AchievementTicker() {
       <div className="achievement-board__header">
         <div className="flex items-center gap-2">
           <div className="w-1.5 h-1.5" style={{ background: colors.exp, clipPath: geometry.diamond }} />
-          <HudText variant="system" color={colors.exp}>ACHIEVEMENTS</HudText>
+          <HudText variant="system" color={colors.exp}>成长印记</HudText>
         </div>
         <HudText variant="label" color={colors.textDim}>{completedCount}/{achievements.length}</HudText>
       </div>

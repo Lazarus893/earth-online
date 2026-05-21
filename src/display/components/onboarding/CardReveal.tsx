@@ -318,7 +318,7 @@ export default function CardReveal({ result, onComplete }: CardRevealProps) {
         transition={{ delay: 0.1, duration: 0.3 }}
       >
         <HudText variant="system" color={colors.patch}>
-          {isComplete ? 'SCAN COMPLETE' : 'DIMENSION SCAN'}
+          {isComplete ? '校准完毕' : '维度扫描中'}
         </HudText>
       </motion.div>
 
@@ -342,7 +342,7 @@ export default function CardReveal({ result, onComplete }: CardRevealProps) {
                 transition={{ duration: 1.5, repeat: Infinity }}
               >
                 <div className="w-1.5 h-1.5" style={{ background: colors.patch, clipPath: geometry.diamond }} />
-                <span className="text-[10px] font-mono tracking-[0.2em] text-gray-500">INITIALIZING</span>
+                <span className="text-[10px] font-mono tracking-[0.2em] text-gray-500">Oracle 苏醒中</span>
               </motion.div>
             </motion.div>
           )}

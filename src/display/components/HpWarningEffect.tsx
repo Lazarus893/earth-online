@@ -14,7 +14,7 @@ interface HpWarningEffectProps {
  * VD08 HP/状态警告动画 — 播放警告闪烁视频 + 提示文字
  * 用于低能量/低状态提醒
  */
-export default function HpWarningEffect({ show, message = 'LOW STATUS WARNING', onComplete }: HpWarningEffectProps) {
+export default function HpWarningEffect({ show, message = '宿主状态告急', onComplete }: HpWarningEffectProps) {
   const onCompleteRef = useRef(onComplete)
   onCompleteRef.current = onComplete
 

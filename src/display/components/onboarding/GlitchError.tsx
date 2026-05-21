@@ -21,7 +21,7 @@ export default function GlitchError({
   show,
   onComplete,
   errorCode = '0x4E2F',
-  errorMessage = '信号衰减，链路中断',
+  errorMessage = '与宿主的连接正在减弱...',
 }: GlitchErrorProps) {
   const [phase, setPhase] = useState<'idle' | 'glitch' | 'warning' | 'fade'>('idle')
   const onCompleteRef = useRef(onComplete)

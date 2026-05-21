@@ -54,7 +54,7 @@ export default function ScanAnimation({ phase = 'scanning' }: ScanAnimationProps
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4, duration: 0.2 }}
         >
-          SCAN COMPLETE
+          灵魂校准完毕
         </motion.p>
       </motion.div>
     )
@@ -131,7 +131,7 @@ export default function ScanAnimation({ phase = 'scanning' }: ScanAnimationProps
           transition={{ duration: 0.8, repeat: Infinity }}
         />
         <span className="text-[11px] font-mono tracking-[0.15em] text-gray-400 uppercase">
-          Calculating attributes
+          正在感知宿主潜力
         </span>
       </div>
     </motion.div>

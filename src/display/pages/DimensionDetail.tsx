@@ -227,7 +227,7 @@ export default function DimensionDetail({ dimension, allDimensions, onBack, onAd
         </button>
 
         <div className="detail-page__breadcrumb">
-          <HudText variant="label" color={colors.textDim}>DIMENSION</HudText>
+          <HudText variant="label" color={colors.textDim}>修行领域</HudText>
           <span style={{ color: dimColor }}>/</span>
           <HudText variant="label" color={dimColor}>{dimension.labelEn.toUpperCase()}</HudText>
         </div>
@@ -337,7 +337,7 @@ export default function DimensionDetail({ dimension, allDimensions, onBack, onAd
             <div style={{ marginTop: 12 }}>
               <div className="detail-panel__head">
                 <div className="detail-panel__dot" style={{ background: colors.patch }} />
-                <HudText variant="system" color={colors.patch}>AGENT ABILITIES</HudText>
+                <HudText variant="system" color={colors.patch}>Oracle 赋能</HudText>
               </div>
               <div className="advisor-shortcuts" style={{ marginTop: 6 }}>
                 {shortcuts.slice(0, 5).map(sc => (
@@ -362,7 +362,7 @@ export default function DimensionDetail({ dimension, allDimensions, onBack, onAd
                   transition={{ duration: 1.2, repeat: Infinity }}
                 >
                   <OracleOrb size={20} />
-                  <span style={{ color: colors.patch }}>Agent 执行中...</span>
+                  <span style={{ color: colors.patch }}>Oracle 执行中...</span>
                 </motion.div>
               )}
               {agentResult && !agentLoading && (
@@ -383,7 +383,7 @@ export default function DimensionDetail({ dimension, allDimensions, onBack, onAd
             {/* 路径标题 */}
             <div className="detail-panel__head">
               <div className="detail-panel__dot" style={{ background: dimColor }} />
-              <HudText variant="system" color={dimColor}>DEVELOPMENT PATH</HudText>
+              <HudText variant="system" color={dimColor}>成长路径</HudText>
               {hierarchyGoals.length > 0 && (
                 <HudText variant="label" color={colors.textDim} style={{ marginLeft: 'auto' }}>
                   {hierarchyGoals.length} goals · {hierarchyGoals.reduce((s, g) => s + g.plans.length, 0)} plans · {hierarchyGoals.reduce((s, g) => s + g.plans.reduce((ps, p) => ps + p.tasks.length, 0), 0)} tasks
@@ -457,7 +457,7 @@ export default function DimensionDetail({ dimension, allDimensions, onBack, onAd
             {/* AI 现状分析 */}
             <div className="detail-panel__head">
               <div className="detail-panel__dot" style={{ background: colors.patch }} />
-              <HudText variant="system" color={colors.patch}>ADVISOR</HudText>
+              <HudText variant="system" color={colors.patch}>Oracle 观察</HudText>
               {advisor.status === 'loading' && (
                 <motion.span
                   className="ml-auto text-[9px] font-mono"
